@@ -1,0 +1,2 @@
+# hawkes_process
+ホークス過程のシミュレーションと推論のためのPythonパッケージ
