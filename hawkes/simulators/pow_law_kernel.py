@@ -2,7 +2,7 @@ import numpy as np
 from .base import BaseSimulator
 from ..kernels.pow_law_kernel import PowLawKernel
 
-class PowLowKernelSimulator(BaseSimulator):
+class PowLawKernelSimulator(BaseSimulator):
     def __init__(self, mus, K_s, p_s, c_s):
 
         # 1次元の場合の対応
