@@ -1,6 +1,6 @@
 import numpy as np
 
-class ExpKernel1D:
+class ExpKernel1DEstimator:
     def __init__(self, delta=0.00001, epsilon=0.01):
         self._delta = delta
         self._epsilon = epsilon

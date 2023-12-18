@@ -1,5 +1,5 @@
-from hawkes.simulation.exp_kernel import ExpKernelSimulator
-from hawkes.simulation.pow_kernel import PowKernelSimulator
+from hawkes.simulators.exp_kernel import ExpKernelSimulator
+from hawkes.simulators.pow_kernel import PowKernelSimulator
 
 baselines = 0.4
 alphas = 0.3
@@ -20,7 +20,7 @@ events = exp_kernel_simulator.simulate(T)
 #events = pow_kernel_simulator.simulate(T)
 
 
-from hawkes.inference.exp_kernel_1D import ExpKernel1D
+from hawkes.estimators.exp_kernel_1D import ExpKernel1D
 
 import numpy as np
 #T = 1000
