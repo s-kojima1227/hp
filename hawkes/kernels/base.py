@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+# FIXME: ABCMeta → ABC
 class BaseKernel(metaclass=ABCMeta):
     """カーネル関数の基底クラス"""
 

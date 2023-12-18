@@ -1,37 +1,25 @@
 import numpy as np
 from scipy.special import gamma, digamma
-from .log_likelihoods.pow_law_kernel_1D import PowLawKernel1DLogLik
 
-class PowLawKernel1DEstimator:
-    def __init__(self, delta=0.00001, epsilon=0.01):
-        self._delta = delta
-        self._epsilon = epsilon
-        self._is_fitted = False
-
-    def fit(self, events, T, init_params=np.array([0.1, 0.1, 0.1, 0.1])):
-        self._is_fitted = True
+# FIXME: 数値安定性が非常に悪い
+class PowLawKernel1DLogLik:
+    def __init__(self, events, T):
         self._events = events
         self._T = T
-        return self._fit_grad(events, init_params)
 
-    def log_likelihood(self, params):
-        if not self._is_fitted:
-            raise Exception("データをフィットしてください")
-        log_lik = PowLawKernel1DLogLik()
-        return log_lik(params, self._events, self._T)
+    def __call__(self, params):
+        mu, K, p, c = params
+        events = self._events
+        n = len(events)
+        T = self._T
+        log_lik = 0
+        log_lik += np.sum([np.log(mu + np.sum(K * np.power(events[i] - events[:i] + c, -p))) for i in range(n)])
+        log_lik -= mu * T
+        log_lik += K / (p - 1) * np.sum(np.power(T - events + c, -(p - 1)) - np.power(c, p - 1))
 
-    def _fit_grad(self, events, init_params):
-        self._events = events
-        params = init_params
-        while True:
-            grad = self._grad(params)
-            params += self._delta * grad
-            if np.linalg.norm(grad) < self._epsilon:
-                break
+        return log_lik
 
-        return params
-
-    def _grad(self, params):
+    def grad(self, params):
         mu, K, p, c = params
         T = self._T
         events = self._events
@@ -47,6 +35,7 @@ class PowLawKernel1DEstimator:
         log_psi = s - np.exp(-s)
         log_dpsi = log_psi + np.log(1 + np.exp(-s))
         psi = np.exp(log_psi)
+
         H_G = Delta * K * np.exp(log_dpsi + (p - 1) * log_psi - c * psi) / gamma(p)
         H_dG_dp = Delta * K * np.exp(log_dpsi + (p - 1) * log_psi - c * psi) * (log_psi - digamma(p)) / gamma(p)
         H_dG_dc = -Delta * K * np.exp(log_dpsi + (p - 1) * log_psi - c * psi) * psi / gamma(p)

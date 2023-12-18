@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
+# FIXME: ABCMeta → ABC
 class BaseSimulator(metaclass=ABCMeta):
     def __init__(self, mus):
         """
