@@ -41,8 +41,9 @@ class PowLawKernel1DEstimator:
         dG_dp = np.zeros(n)
         dG_dc = np.zeros(n)
 
-        Delta = 1.0 / 16
-        s = np.linspace(-9, 9, (1 / Delta) * 18 + 1)
+        num_division = 16
+        Delta = 1.0 / num_division
+        s = np.linspace(-9, 9, num_division * 18 + 1)
         log_psi = s - np.exp(-s)
         log_dpsi = log_psi + np.log(1 + np.exp(-s))
         psi = np.exp(log_psi)
