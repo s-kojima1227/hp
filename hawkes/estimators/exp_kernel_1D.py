@@ -1,14 +1,24 @@
 import numpy as np
+from .log_likelihoods.exp_kernel_1D import ExpKernel1DLogLik
 
 class ExpKernel1DEstimator:
     def __init__(self, delta=0.00001, epsilon=0.01):
         self._delta = delta
         self._epsilon = epsilon
+        self._is_fitted = False
 
     def fit(self, events, T, init_params=np.array([0.1, 0.1, 0.1])):
+        self._is_fitted = True
         self._events = events
         self._T = T
         return self._fit_grad(events, init_params)
+
+    def log_likelihood(self, params):
+        if not self._is_fitted:
+            raise Exception("データをフィットしてください")
+
+        log_lik = ExpKernel1DLogLik()
+        return log_lik(params, self._events, self._T)
 
     # 勾配法による最尤法の数値解放
     def _fit_grad(self, events, init_params):
