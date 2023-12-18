@@ -1,8 +1,8 @@
 import numpy as np
 from .base import BaseSimulator
-from ..kernels.pow_kernel import PowKernel
+from ..kernels.pow_law_kernel import PowLawKernel
 
-class PowKernelSimulator(BaseSimulator):
+class PowLowKernelSimulator(BaseSimulator):
     def __init__(self, mus, K_s, p_s, c_s):
 
         # 1次元の場合の対応
@@ -27,7 +27,7 @@ class PowKernelSimulator(BaseSimulator):
 
         for i in range(n_nodes):
             for j in range(n_nodes):
-                kernels[i, j] = PowKernel(self._K_s[i, j], self._p_s[i, j], self._c_s[i, j])
+                kernels[i, j] = PowLawKernel(self._K_s[i, j], self._p_s[i, j], self._c_s[i, j])
 
         return kernels
 

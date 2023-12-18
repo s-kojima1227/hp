@@ -1,7 +1,7 @@
 import numpy as np
 from .base import BaseKernel
 
-class PowKernel(BaseKernel):
+class PowLawKernel(BaseKernel):
     def __init__(self, K: float, p: float, c: float):
         self._K = float(K)
         self._p = float(p)

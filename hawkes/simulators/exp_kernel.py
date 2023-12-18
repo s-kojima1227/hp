@@ -4,15 +4,13 @@ from ..kernels.exp_kernel import ExpKernel
 
 class ExpKernelSimulator(BaseSimulator):
     def __init__(self, mu_s, a_s, b_s):
-        """初期化メソッド
-
-        Parameters
-        ----------
-        mus : np.ndarray, shape=(n,)
-            ベースライン
-        alphas : np.ndarray, shape=(n, n)
-            イベント発生時のインパルス
-        betas : np.ndarray, shape=(n, n)
+        """Parameters
+        mu_s : np.ndarray, shape=(n,) or float
+            基底強度 (過去のイベントの影響を受けずに発生するイベントの強度を表す)
+        a_s : np.ndarray, shape=(n, n) or float
+            影響率 (過去のイベントが次のイベントを引き起こす影響の大きさを表す)
+        b_s : np.ndarray, shape=(n, n) or float
+            減衰率 (過去のイベントの影響が時間と共にどれだけ速く減少するかを表す)
         """
 
         # 1次元の場合の対応
@@ -38,4 +36,3 @@ class ExpKernelSimulator(BaseSimulator):
                 kernels[i, j] = ExpKernel(self._a_s[i, j], self._b_s[i, j])
 
         return kernels
-
