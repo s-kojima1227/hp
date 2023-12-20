@@ -32,6 +32,12 @@ class ExpKernelModel:
         return optimizer(log_lik_fn)
 
     def score(self, mu, a, b, events, T):
+        # 1次元の場合の対応
+        if isinstance(mu, (int, float)):
+            mu = np.array([mu])
+            a = np.array([[a]])
+            b = np.array([[b]])
+            events = [events]
         log_lik_fn = ExpKernelLogLik(events, T)
         return log_lik_fn(mu, a, b)
 

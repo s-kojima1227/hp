@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import japanize_matplotlib
 from .function_io import FunctionIO
 
@@ -26,22 +27,33 @@ class SimulationOutput:
 
     @property
     def params(self):
-        return self._params
+        return {**self._params, **{'T': self._T}}
 
     @property
     def kernel_type(self):
         return self._kernel_type
 
-    def plot(self, ax=None):
-        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, sharex=True, figsize=(20, 5))
+    def plot(self):
+        fig, (ax_legend, ax1, ax2, ax3) = plt.subplots(4, 1, sharex=True, figsize=(20, 5))
         plt.subplots_adjust(hspace=0.4)
-        padding = 5
+        padding = 1
         ax1.set_xlim(0 - padding, self._T + padding)
         color_palette = plt.cm.tab10
+        # ax_text.axis('off')
+        # kernel_type_text = '- kernel_type: {}'.format(self.kernel_type)
+        # params_text = '- params: {}'.format(self.params)
+        # end_time_text = '- end_time: {}'.format(self._T)
+        # events_text = '- events:\n' + '\n'.join(['  - dim_{}: {}'.format(i, np.round(self.events[i], 2)) for i in range(self._dim)])
+        # text = '\n'.join([kernel_type_text, params_text, end_time_text])
+        # ax_text.text(0, 1, text, ha='left', va='center', fontsize=12)
+
+        ax_legend.axis('off')
+        handles = []  # 凡例のためのハンドルを格納するリスト
 
         for i in range(self._dim):
             # カラーパレットから色を選択
             color = color_palette(i)
+            handles.append(mpatches.Patch(color=color, label=f'次元 {i+1}'))
 
             events_i = self._events[i]
             intensity_i = self._intensity[i]
@@ -51,7 +63,7 @@ class SimulationOutput:
             cumulative_counts = np.hstack([cumulative_counts, cumulative_counts[-1]])
 
             # 累積イベント数をプロット
-            ax1.step(event_with_bounds, cumulative_counts, where='post', label='累積イベント数', color=color)
+            ax1.step(event_with_bounds, cumulative_counts, where='post', label=f'次元 {i+1}', color=color)
             ax1.set_title('累積イベント数')
 
             # イベント発生時刻をプロット
@@ -61,6 +73,7 @@ class SimulationOutput:
 
             # 条件付き強度をプロット
             ax3.plot(intensity_i.input, intensity_i.output, color=color)
-            ax3.set_title('観測された条件付き強度')
+            ax3.set_title('強度')
 
+        ax_legend.legend(handles=handles, loc='lower left', ncol=self._dim)
         plt.show()

@@ -38,6 +38,13 @@ class PowLawKernelModel:
         return optimizer(log_lik_fn)
 
     def score(self, mu, K, p, c, events, T):
+        # 1次元の場合の対応
+        if isinstance(mu, (int, float)):
+            mu = np.array([mu])
+            K = np.array([[K]])
+            p = np.array([[p]])
+            c = np.array([[c]])
+            events = [events]
         log_lik_fn = PowLawKernelLogLik(events, T)
         return log_lik_fn(mu, K, p, c)
 
@@ -58,4 +65,4 @@ class PowLawKernelModel:
         t_vals = np.arange(0, T + delta, delta)
         intensity = IntensityFunction(mu, kernel, events)(t_vals)
 
-        return SimulationOutput(events, T, intensity, params={'mu': mu, 'K': K, 'p': p, 'c': c}, kernel_type='pow_law_kernel')
+        return SimulationOutput(events, T, intensity, params={'mu': mu.tolist(), 'K': K.tolist(), 'p': p.tolist(), 'c': c.tolist()}, kernel_type='pow_law_kernel')

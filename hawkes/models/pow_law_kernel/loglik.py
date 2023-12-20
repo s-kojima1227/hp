@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import gamma, digamma
 from .kernel import PowLawKernel
 
 class PowLawKernelLogLik:
@@ -26,19 +27,17 @@ class PowLawKernelLogLik:
 
             for j in range(self._dim):
                 t_j = self._events[j]
-                tmp = np.sum(K[i, j] * (p[i, j] - 1) * (1 / np.power(T + c[i, j], p[i, j] - 1) - 1 / np.power(t_j + c[i, j], p[i, j] - 1)))
-                print(tmp)
-                log_lik += np.sum(K[i, j] * (p[i, j] - 1) * (1 / np.power(T + c[i, j], p[i, j] - 1) - 1 / np.power(t_j + c[i, j], p[i, j] - 1)))
+                log_lik += np.sum(K[i, j] * (p[i, j] - 1) * (1 / np.power(T - t_j + c[i, j], p[i, j] - 1) - 1 / np.power(c[i, j], p[i, j] - 1)))
 
         return log_lik
 
     def grad(self, params):
         if self._dim != 1:
             raise NotImplementedError('勾配計算は現在1次元のみ対応しています')
+        events = self._events[0]
 
         mu, K, p, c = params
         T = self._T
-        events = self._events
         n = len(events)
         G = np.zeros(n)
         dG_dK = np.zeros(n)
