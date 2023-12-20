@@ -1,7 +1,6 @@
 import numpy as np
-from .base import BaseKernel
 
-class ExpKernel(BaseKernel):
+class ExpKernel:
     def __init__(self, a: float, b: float):
         self._a = a
         self._b = b

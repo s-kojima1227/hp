@@ -1,25 +1,41 @@
 import numpy as np
-from scipy.special import gamma, digamma
+from .kernel import PowLawKernel
 
-# FIXME: 数値安定性が非常に悪い
-class PowLawKernel1DLogLik:
+class PowLawKernelLogLik:
     def __init__(self, events, T):
         self._events = events
         self._T = T
+        self._dim = len(events)
 
-    def __call__(self, params):
-        mu, K, p, c = params
-        events = self._events
-        n = len(events)
-        T = self._T
+    def __call__(self, mu, K, p, c):
         log_lik = 0
-        log_lik += np.sum([np.log(mu + np.sum(K * np.power(events[i] - events[:i] + c, -p))) for i in range(n)])
-        log_lik -= mu * T
-        log_lik += K / (p - 1) * np.sum(np.power(T - events + c, -(p - 1)) - np.power(c, p - 1))
+        events = self._events
+        T = self._T
+        for i in range(self._dim):
+            log_lik -= mu[i] * T
+            t_i = self._events[i]
+            n_jumps_i = t_i.shape[0]
+
+            for j in range(n_jumps_i):
+                s = mu[i]
+                t_i_j = t_i[j]
+                for k in range(self._dim):
+                    kernel = PowLawKernel(K[i, k], p[i, k], c[i, k])
+                    s += np.sum(kernel(t_i_j - events[k][events[k] < t_i_j]))
+                log_lik += np.log(s)
+
+            for j in range(self._dim):
+                t_j = self._events[j]
+                tmp = np.sum(K[i, j] * (p[i, j] - 1) * (1 / np.power(T + c[i, j], p[i, j] - 1) - 1 / np.power(t_j + c[i, j], p[i, j] - 1)))
+                print(tmp)
+                log_lik += np.sum(K[i, j] * (p[i, j] - 1) * (1 / np.power(T + c[i, j], p[i, j] - 1) - 1 / np.power(t_j + c[i, j], p[i, j] - 1)))
 
         return log_lik
 
     def grad(self, params):
+        if self._dim != 1:
+            raise NotImplementedError('勾配計算は現在1次元のみ対応しています')
+
         mu, K, p, c = params
         T = self._T
         events = self._events
