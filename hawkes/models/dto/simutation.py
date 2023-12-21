@@ -33,20 +33,20 @@ class SimulationOutput:
     def kernel_type(self):
         return self._kernel_type
 
+    def info(self):
+        kernel_type_text = '- kernel_type: {}'.format(self.kernel_type)
+        params_text = '- params: {}'.format(self._params)
+        end_time_text = '- end_time: {}'.format(self._T)
+        events_text = '- events:\n' + '\n'.join(['  - dim_{}: {}'.format(i + 1, np.round(self._events[i], 2)) for i in range(self._dim)])
+        text = '\n'.join([kernel_type_text, params_text, end_time_text, events_text])
+        print(text)
+
     def plot(self):
         fig, (ax_legend, ax1, ax2, ax3) = plt.subplots(4, 1, sharex=True, figsize=(20, 5))
         plt.subplots_adjust(hspace=0.4)
         padding = 1
         ax1.set_xlim(0 - padding, self._T + padding)
         color_palette = plt.cm.tab10
-        # ax_text.axis('off')
-        # kernel_type_text = '- kernel_type: {}'.format(self.kernel_type)
-        # params_text = '- params: {}'.format(self.params)
-        # end_time_text = '- end_time: {}'.format(self._T)
-        # events_text = '- events:\n' + '\n'.join(['  - dim_{}: {}'.format(i, np.round(self.events[i], 2)) for i in range(self._dim)])
-        # text = '\n'.join([kernel_type_text, params_text, end_time_text])
-        # ax_text.text(0, 1, text, ha='left', va='center', fontsize=12)
-
         ax_legend.axis('off')
         handles = []  # 凡例のためのハンドルを格納するリスト
 

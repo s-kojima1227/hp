@@ -57,4 +57,4 @@ class GradientOptimizer:
             if np.linalg.norm(grad) < self._tol:
                 break
 
-        return params
+        return params, objective_fn(*params)

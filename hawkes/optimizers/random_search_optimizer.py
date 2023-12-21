@@ -1,7 +1,7 @@
 import numpy as np
 
 class RandomSearchOptimizerSettings:
-    def __init__(self, n_iter=1000000, search_space=None):
+    def __init__(self, n_iter=10000, search_space=None):
         self._n_iter = n_iter
         self._search_space = search_space
 
