@@ -1,4 +1,7 @@
-from .models import ExpKernelModel, PowLawKernelModel
-from .optimizers import GradientOptimizerSettings, RandomSearchOptimizerSettings
+from .exp_kernel import ExpKernelModel
+from .pow_law_kernel import PowLawKernelModel
 
-__all__ = ['ExpKernelModel', 'PowLawKernelModel', 'GradientOptimizerSettings', 'RandomSearchOptimizerSettings']
+__all__ = [
+    'ExpKernelModel',
+    'PowLawKernelModel'
+]
