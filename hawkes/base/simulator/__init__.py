@@ -1,3 +1,5 @@
-from .thinning_method import ThinningMethodSimulator
+from .simulator import Simulator
 
-__all__ = ['ThinningMethodSimulator']
+__all__ = [
+    'Simulator'
+]

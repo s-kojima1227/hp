@@ -2,23 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import japanize_matplotlib
-from ..function_io import FunctionIO
 
-class EstimationOutput:
-    def __init__(self, events: list[np.ndarray], T, intensity: list[FunctionIO], params, kernel_type, loglik):
+class Output:
+    def __init__(self, events, T, t, intensity, params, kernel_type):
         self._events = events
-        self._dim = len(events)
         self._T = T
+        self._t = t
         self._intensity = intensity
         self._params = params
         self._kernel_type = kernel_type
-        self._loglik = loglik
+        self._dim = len(events)
 
     @property
     def events(self):
         if (self._dim == 1):
             return self._events[0]
         return self._events
+
+    @property
+    def T(self):
+        return self._T
 
     @property
     def intensity(self):
@@ -28,15 +31,18 @@ class EstimationOutput:
 
     @property
     def params(self):
-        return {**self._params, **{'T': self._T}}
+        return self._params
+
+    @property
+    def kernel_type(self):
+        return self._kernel_type
 
     def info(self):
-        kernel_type_text = '- kernel_type: {}'.format(self._kernel_type)
+        kernel_type_text = '- kernel_type: {}'.format(self.kernel_type)
         params_text = '- params: {}'.format(self._params)
-        loglik_text = '- log_likelihood: {}'.format(self._loglik)
         end_time_text = '- end_time: {}'.format(self._T)
         events_text = '- events:\n' + '\n'.join(['  - dim_{}: {}'.format(i + 1, np.round(self._events[i], 2)) for i in range(self._dim)])
-        text = '\n'.join([kernel_type_text, params_text, loglik_text, end_time_text, events_text])
+        text = '\n'.join([kernel_type_text, params_text, end_time_text, events_text])
         print(text)
 
     def plot(self):
@@ -70,7 +76,7 @@ class EstimationOutput:
             ax2.set_title('イベント発生時刻')
 
             # 条件付き強度をプロット
-            ax3.plot(intensity_i.input, intensity_i.output, color=color)
+            ax3.plot(self._t, intensity_i, color=color)
             ax3.set_title('強度')
 
         ax_legend.legend(handles=handles, loc='lower left', ncol=self._dim)
