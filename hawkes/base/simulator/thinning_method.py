@@ -1,6 +1,6 @@
 import numpy as np
 
-class ThinningMethodSimulator:
+class ThinningMethod:
     """間引き法によるHawkes過程のシミュレータ"""
     def __init__(self, mu, kernel):
         """

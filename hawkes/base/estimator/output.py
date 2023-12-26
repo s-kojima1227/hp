@@ -2,16 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import japanize_matplotlib
-from ..function_io import FunctionIO
 
-class SimulationOutput:
-    def __init__(self, events: list[np.ndarray], T, intensity: list[FunctionIO], params, kernel_type):
+class Output:
+    def __init__(self, events, T, t, intensity, params, kernel_type, loglik):
         self._events = events
-        self._dim = len(events)
         self._T = T
+        self._t = t
         self._intensity = intensity
         self._params = params
         self._kernel_type = kernel_type
+        self._loglik = loglik
+        self._dim = len(events)
 
     @property
     def events(self):
@@ -31,18 +32,23 @@ class SimulationOutput:
 
     @property
     def params(self):
-        return {**self._params, **{'T': self._T}}
+        return self._params
 
     @property
     def kernel_type(self):
         return self._kernel_type
 
+    @property
+    def loglik(self):
+        return self._loglik
+
     def info(self):
         kernel_type_text = '- kernel_type: {}'.format(self.kernel_type)
         params_text = '- params: {}'.format(self._params)
         end_time_text = '- end_time: {}'.format(self._T)
+        loglik_text = '- loglik: {}'.format(self._loglik)
         events_text = '- events:\n' + '\n'.join(['  - dim_{}: {}'.format(i + 1, np.round(self._events[i], 2)) for i in range(self._dim)])
-        text = '\n'.join([kernel_type_text, params_text, end_time_text, events_text])
+        text = '\n'.join([kernel_type_text, params_text, end_time_text, loglik_text, events_text])
         print(text)
 
     def plot(self):
@@ -76,7 +82,7 @@ class SimulationOutput:
             ax2.set_title('イベント発生時刻')
 
             # 条件付き強度をプロット
-            ax3.plot(intensity_i.input, intensity_i.output, color=color)
+            ax3.plot(self._t, intensity_i, color=color)
             ax3.set_title('強度')
 
         ax_legend.legend(handles=handles, loc='lower left', ncol=self._dim)

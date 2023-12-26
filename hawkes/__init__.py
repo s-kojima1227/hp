@@ -1,7 +1,5 @@
-from .exp_kernel import ExpKernelModel
-from .pow_law_kernel import PowLawKernelModel
+from .model import Model
 
 __all__ = [
-    'ExpKernelModel',
-    'PowLawKernelModel'
+    'Model'
 ]

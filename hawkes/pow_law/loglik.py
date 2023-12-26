@@ -1,14 +1,15 @@
 import numpy as np
+from ..base import LogLik as BaseLogLik
+from .kernel import Kernel
 from scipy.special import gamma, digamma
-from .kernel import PowLawKernel
 
-class PowLawKernelLogLik:
-    def __init__(self, events, T):
-        self._events = events
-        self._T = T
-        self._dim = len(events)
+class LogLik(BaseLogLik):
+    def __call__(self, params):
+        mu = params[:self._dim]
+        K = params[self._dim:self._dim * (self._dim + 1)].reshape(self._dim, self._dim)
+        p = params[self._dim * (self._dim + 1):self._dim * (2 * self._dim + 1)].reshape(self._dim, self._dim)
+        c = params[self._dim * (2 * self._dim + 1):].reshape(self._dim, self._dim)
 
-    def __call__(self, mu, K, p, c):
         log_lik = 0
         events = self._events
         T = self._T
@@ -21,7 +22,7 @@ class PowLawKernelLogLik:
                 s = mu[i]
                 t_i_j = t_i[j]
                 for k in range(self._dim):
-                    kernel = PowLawKernel(K[i, k], p[i, k], c[i, k])
+                    kernel = Kernel(K[i, k], p[i, k], c[i, k])
                     s += np.sum(kernel(t_i_j - events[k][events[k] < t_i_j]))
                 log_lik += np.log(s)
 
