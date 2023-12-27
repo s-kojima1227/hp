@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import japanize_matplotlib
-from ..events import Events
+from ..vo.events import Events
 
 class Output:
     def __init__(self, events: Events, t, intensity, params, kernel_type, loglik):

@@ -7,7 +7,7 @@ from .minimizer import (
 )
 from .output import Output
 from abc import ABC, abstractmethod
-from ..events import Events, EventsFactory
+from ..vo import Events, EventsFactory
 
 class Estimator(ABC):
     def __init__(self, t_interval=1):
@@ -24,16 +24,14 @@ class Estimator(ABC):
 
         minimizer = self._build_minimizer(events.dim)
         loss = self._build_loss(events)
-
         params, loss = minimizer(loss)
-
         t = np.arange(0, T + self.t_interval, self.t_interval)
-        intensity = self._build_intensity(params, events)
+        intensities = self._build_intensities(params, events)
 
         return Output(
             events=events,
             t=t,
-            intensity=np.array([intensity[i](t) for i in range(events.dim)]),
+            intensity=intensities(t),
             params=self._format_params(params, events.dim),
             kernel_type=self._get_kernel_type(),
             loglik=-loss,
@@ -81,7 +79,7 @@ class Estimator(ABC):
         pass
 
     @abstractmethod
-    def _build_intensity(self, params, events: Events):
+    def _build_intensities(self, params, events: Events):
         pass
 
     @abstractmethod
@@ -95,3 +93,4 @@ class Estimator(ABC):
     @abstractmethod
     def _format_params(self, params, dim):
         pass
+

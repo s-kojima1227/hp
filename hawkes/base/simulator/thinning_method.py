@@ -1,5 +1,5 @@
 import numpy as np
-from ..events import Events, EventsFactory
+from ..vo import Events, EventsFactory
 
 class ThinningMethod:
     """間引き法によるHawkes過程のシミュレータ"""
@@ -11,6 +11,8 @@ class ThinningMethod:
         kernels : np.ndarray, shape=(n, n)
             カーネル関数の行列
         """
+        # FIXME: カーネルの取り扱いを変更する
+        kernel = kernel.value
         if mu.shape[0] != kernel.shape[0] or mu.shape[0] != kernel.shape[1]:
             raise ValueError('基底強度パラメータとカーネル関数の次元が一致しません')
 
