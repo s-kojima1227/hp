@@ -1,12 +1,12 @@
 import numpy as np
 from .loglik import LogLik
-from ..base import Estimator as BaseEstimator
+from ..base import Estimator as BaseEstimator, Events
 from .converter import ParamsConverter, BoundsConverter
 from .intensity import Intensity
 
 class Estimator(BaseEstimator):
-    def _build_loss(self, events, T):
-        return LogLik(events, T).build_loss()
+    def _build_loss(self, events: Events):
+        return LogLik(events).build_loss()
 
     def _get_default_minimization_config(self, dim):
         return {
@@ -42,8 +42,8 @@ class Estimator(BaseEstimator):
 
         super().set_minimization_config(method, option)
 
-    def _build_intensity(self, params, events, dim):
-        mu, a, b = ParamsConverter.unpack(params, dim)
+    def _build_intensity(self, params, events: Events):
+        mu, a, b = ParamsConverter.unpack(params, events.dim)
         return Intensity(mu, a, b, events)
 
     def _format_params(self, params, dim):

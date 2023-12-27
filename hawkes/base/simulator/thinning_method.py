@@ -1,4 +1,5 @@
 import numpy as np
+from ..events import Events, EventsFactory
 
 class ThinningMethod:
     """間引き法によるHawkes過程のシミュレータ"""
@@ -17,7 +18,7 @@ class ThinningMethod:
         self._mu = mu
         self._kernel = kernel
 
-    def __call__(self, T):
+    def __call__(self, T) -> Events:
         """シミュレーションを実行する
 
         Parameters
@@ -58,7 +59,7 @@ class ThinningMethod:
             else:
                 lambda_ast = lambda_
 
-        return events
+        return EventsFactory.from_events_grouped_by_mark(events, T)
 
     def _lambda(self, t, events):
         """全ノードにおける条件付き強度を計算する"""

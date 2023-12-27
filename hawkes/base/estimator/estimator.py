@@ -7,6 +7,7 @@ from .minimizer import (
 )
 from .output import Output
 from abc import ABC, abstractmethod
+from ..events import Events, EventsFactory
 
 class Estimator(ABC):
     def __init__(self, t_interval=1):
@@ -19,29 +20,29 @@ class Estimator(ABC):
         if isinstance(events, np.ndarray):
             events = [events]
 
-        self._dim = len(events)
-        minimizer = self._build_minimizer()
-        loss = self._build_loss(events, T)
+        events = EventsFactory.from_events_grouped_by_mark(events, T)
+
+        minimizer = self._build_minimizer(events.dim)
+        loss = self._build_loss(events)
 
         params, loss = minimizer(loss)
 
         t = np.arange(0, T + self.t_interval, self.t_interval)
-        intensity = self._build_intensity(params, events, self._dim)
+        intensity = self._build_intensity(params, events)
 
         return Output(
             events=events,
-            T=T,
             t=t,
-            intensity=np.array([intensity[i](t) for i in range(self._dim)]),
-            params=self._format_params(params, self._dim),
+            intensity=np.array([intensity[i](t) for i in range(events.dim)]),
+            params=self._format_params(params, events.dim),
             kernel_type=self._get_kernel_type(),
             loglik=-loss,
         )
 
-    def _build_minimizer(self):
+    def _build_minimizer(self, dim):
         minimization_config = self._minimization_config
         if minimization_config is None:
-            minimization_config = self._get_default_minimization_config(self._dim)
+            minimization_config = self._get_default_minimization_config(dim)
 
         method = minimization_config['method']
         option = minimization_config['option']
@@ -76,11 +77,11 @@ class Estimator(ABC):
         }
 
     @abstractmethod
-    def _build_loss(self, events, T):
+    def _build_loss(self, events: Events):
         pass
 
     @abstractmethod
-    def _build_intensity(self, params, events, dim):
+    def _build_intensity(self, params, events: Events):
         pass
 
     @abstractmethod

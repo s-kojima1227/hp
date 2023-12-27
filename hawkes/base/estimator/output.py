@@ -2,17 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import japanize_matplotlib
+from ..events import Events
 
 class Output:
-    def __init__(self, events, T, t, intensity, params, kernel_type, loglik):
-        self._events = events
-        self._T = T
+    def __init__(self, events: Events, t, intensity, params, kernel_type, loglik):
+        self._events = events.grouped_by_mark
+        self._T = events.end_time
+        self._dim = events.dim
         self._t = t
         self._intensity = intensity
         self._params = params
         self._kernel_type = kernel_type
         self._loglik = loglik
-        self._dim = len(events)
 
     @property
     def events(self):
