@@ -1,44 +1,29 @@
+from ...base import LogLik as Base, Events
+from .intensity import Intensities
+from .compensator import compensators
 import numpy as np
-from ..base import LogLik as BaseLogLik
-from .kernel import Kernel
+from ..converter import ParamsConverter
 from scipy.special import gamma, digamma
+from .kernel import Kernels
 
-class LogLik(BaseLogLik):
-    def __call__(self, params):
-        mu = params[:self._dim]
-        K = params[self._dim:self._dim * (self._dim + 1)].reshape(self._dim, self._dim)
-        p = params[self._dim * (self._dim + 1):self._dim * (2 * self._dim + 1)].reshape(self._dim, self._dim)
-        c = params[self._dim * (2 * self._dim + 1):].reshape(self._dim, self._dim)
+class LogLik(Base):
+    def _intensity_i(self, mark, time, events: Events, params):
+        intensities = Intensities(params, events)
+        return intensities[mark](time)
 
-        log_lik = 0
-        events = self._events
-        T = self._T
-        for i in range(self._dim):
-            log_lik -= mu[i] * T
-            t_i = self._events[i]
-            n_jumps_i = t_i.shape[0]
-
-            for j in range(n_jumps_i):
-                s = mu[i]
-                t_i_j = t_i[j]
-                for k in range(self._dim):
-                    kernel = Kernel(K[i, k], p[i, k], c[i, k])
-                    s += np.sum(kernel(t_i_j - events[k][events[k] < t_i_j]))
-                log_lik += np.log(s)
-
-            for j in range(self._dim):
-                t_j = self._events[j]
-                log_lik += np.sum(K[i, j] * (p[i, j] - 1) * (1 / np.power(T - t_j + c[i, j], p[i, j] - 1) - 1 / np.power(c[i, j], p[i, j] - 1)))
-
-        return log_lik
+    def _compensators(self, time, events: Events, params):
+        return compensators(time, events, params)
 
     def grad(self, params):
-        if self._dim != 1:
+        dim = self._events.dim
+
+        if dim != 1:
             raise NotImplementedError('勾配計算は現在1次元のみ対応しています')
-        events = self._events[0]
+
+        events = self._events.grouped_by_mark[0]
+        T = self._events.end_time
 
         mu, K, p, c = params
-        T = self._T
         n = len(events)
         G = np.zeros(n)
         dG_dK = np.zeros(n)
