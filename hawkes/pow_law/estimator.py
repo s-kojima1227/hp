@@ -1,7 +1,7 @@
 import numpy as np
 from .function import LogLik, Intensities
 from ..base import Events, Estimator as Base
-from .converter import ParamsConverter, BoundsConverter
+from .converter import ParamsConverter as PC, BoundsConverter as BC
 
 class Estimator(Base):
     def _build_loss(self, events: Events):
@@ -25,7 +25,7 @@ class Estimator(Base):
             p = init_params.get('p')
             c = init_params.get('c')
             option['init_params'] = \
-                ParamsConverter.pack(*ParamsConverter.toTensor(mu, K, p, c))
+                PC.pack(*PC.to_tensor(mu, K, p, c))
         if method == 'scipy' or method == 'random_search':
             bounds = option.get('bounds')
             bounds_mu = bounds.get('mu')
@@ -33,7 +33,7 @@ class Estimator(Base):
             bounds_p = bounds.get('p')
             bounds_c = bounds.get('c')
             option['bounds'] = \
-                BoundsConverter.pack(*BoundsConverter.toTensor(bounds_mu, bounds_K, bounds_p, bounds_c))
+                BC.pack(*BC.to_tensor(bounds_mu, bounds_K, bounds_p, bounds_c))
         if method == 'grid_search':
             grid = option.get('grid')
             grid_mu = grid.get('mu')
@@ -41,7 +41,7 @@ class Estimator(Base):
             grid_p = grid.get('p')
             grid_c = grid.get('c')
             option['grid'] = \
-                BoundsConverter.pack(*BoundsConverter.toTensor(grid_mu, grid_K, grid_p, grid_c))
+                BC.pack(*BC.to_tensor(grid_mu, grid_K, grid_p, grid_c))
 
         super().set_minimization_config(method, option)
 
@@ -49,7 +49,7 @@ class Estimator(Base):
         return Intensities(params, events)
 
     def _format_params(self, params, dim):
-        return ParamsConverter.toDict(*ParamsConverter.unpack(params, dim))
+        return PC.to_dict(*PC.unpack(params, dim))
 
     def _get_kernel_type(self):
         return 'pow_law'

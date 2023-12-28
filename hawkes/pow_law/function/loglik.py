@@ -2,9 +2,7 @@ from ...base import LogLik as Base, Events
 from .intensity import Intensities
 from .compensator import compensators
 import numpy as np
-from ..converter import ParamsConverter
 from scipy.special import gamma, digamma
-from .kernel import Kernels
 
 class LogLik(Base):
     def _intensity_i(self, mark, time, events: Events, params):

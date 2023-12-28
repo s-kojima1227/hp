@@ -5,10 +5,7 @@ class Kernels:
         if not (a.shape == b.shape):
             raise ValueError('パラメーターの次元が不適切です: a.shape={}, b.shape={}'.format(a.shape, b.shape))
         dim = a.shape[0]
-        self._kernels = np.array([
-            [self._Kernel(a[i, j], b[i, j]) for j in range(dim)] for i in range(dim)],
-            dtype=object
-        )
+        self._kernels = np.array([[self._Kernel(a[i, j], b[i, j]) for j in range(dim)] for i in range(dim)], dtype=object)
 
     def __getitem__(self, i):
         return self._kernels[i]

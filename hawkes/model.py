@@ -1,5 +1,6 @@
 from .exp import Estimator as ExpKernelEstimator, Simulator as ExpKernelSimulator
 from .pow_law import Estimator as PowLawKernelEstimator, Simulator as PowLawKernelSimulator
+from .sum_exp import Simulator as SumExpKernelSimulator
 
 class Model:
     @staticmethod
@@ -20,6 +21,6 @@ class Model:
         elif kernel == 'pow_law':
             return PowLawKernelSimulator()
         elif kernel == 'sum_exp':
-            raise NotImplementedError()
+            return SumExpKernelSimulator()
         else:
             raise ValueError('不正なカーネル名です: {}'.format(kernel))

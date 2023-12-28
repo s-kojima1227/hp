@@ -93,4 +93,3 @@ class Estimator(ABC):
     @abstractmethod
     def _format_params(self, params, dim):
         pass
-

@@ -2,7 +2,7 @@ import numpy as np
 
 class ParamsConverter:
     @staticmethod
-    def toTensor(mu, K, p, c):
+    def to_tensor(mu, K, p, c):
         if isinstance(mu, (int, float)):
             return (np.array([mu]), np.array([[K]]), np.array([[p]]), np.array([[c]]))
         else:
@@ -20,12 +20,12 @@ class ParamsConverter:
         c = params[dim * (2 * dim + 1):].reshape(dim, dim)
         return mu, K, p, c
 
-    def toDict(mu, K, p, c):
+    def to_dict(mu, K, p, c):
         return {'mu': mu, 'K': K, 'p': p, 'c': c}
 
 class BoundsConverter:
     @staticmethod
-    def toTensor(bounds_mu, bounds_K, bounds_p, bounds_c):
+    def to_tensor(bounds_mu, bounds_K, bounds_p, bounds_c):
         if isinstance(bounds_mu, (tuple, slice)):
             return (np.array([bounds_mu]), np.array([[bounds_K]]), np.array([[bounds_p]]), np.array([[bounds_c]]))
         else:

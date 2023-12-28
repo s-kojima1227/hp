@@ -3,7 +3,7 @@ from ...base import LogLik as Base
 from .intensity import Intensities
 from .compensator import compensators
 import numpy as np
-from ..converter import ParamsConverter
+from ..converter import ParamsConverter as PC
 
 class LogLik(Base):
     def _intensity_i(self, mark, time, events: Events, params):
@@ -21,7 +21,7 @@ class LogLik(Base):
             raise NotImplementedError('指数カーネルの場合の対数尤度の勾配計算は現在1次元のみ対応しています')
 
         events = self._events.grouped_by_mark[0]
-        mu, a, b = ParamsConverter.unpack(params, dim)
+        mu, a, b = PC.unpack(params, dim)
         n = len(events)
         G = np.zeros(n)
         dG_db = np.zeros(n)
@@ -45,9 +45,7 @@ class LogLik(Base):
     def _calc_loglik(self, params):
         dim = self._events.dim
         T = self._events.end_time
-        mu = params[:dim]
-        a = params[dim:dim * (dim + 1)].reshape(dim, dim)
-        b = params[dim * (dim + 1):].reshape(dim, dim)
+        mu, a, b = PC.unpack(params, dim)
         events = self._events.grouped_by_mark
 
         log_lik = 0
