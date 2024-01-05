@@ -1,6 +1,6 @@
 from .exp import Estimator as ExpKernelEstimator, Simulator as ExpKernelSimulator
 from .pow_law import Estimator as PowLawKernelEstimator, Simulator as PowLawKernelSimulator
-from .sum_exp import Simulator as SumExpKernelSimulator
+# from .sum_exp import Simulator as SumExpKernelSimulator
 
 class Model:
     @staticmethod
@@ -9,8 +9,8 @@ class Model:
             return ExpKernelEstimator()
         elif kernel == 'pow_law':
             return PowLawKernelEstimator()
-        elif kernel == 'sum_exp':
-            raise NotImplementedError()
+        # elif kernel == 'sum_exp':
+        #     raise NotImplementedError()
         else:
             raise ValueError('不正なカーネル名です: {}'.format(kernel))
 
@@ -20,7 +20,7 @@ class Model:
             return ExpKernelSimulator()
         elif kernel == 'pow_law':
             return PowLawKernelSimulator()
-        elif kernel == 'sum_exp':
-            return SumExpKernelSimulator()
+        # elif kernel == 'sum_exp':
+        #     return SumExpKernelSimulator()
         else:
             raise ValueError('不正なカーネル名です: {}'.format(kernel))

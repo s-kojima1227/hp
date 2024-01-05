@@ -1,27 +1,5 @@
 import numpy as np
 
-class ParamsConverter:
-    @staticmethod
-    def to_tensor(mu, a, b):
-        if isinstance(mu, (int, float)):
-            return (np.array([mu]), np.array([[a]]), np.array([[b]]))
-        else:
-            return (np.array(mu), np.array(a), np.array(b))
-
-    @staticmethod
-    def pack(mu, a, b):
-        return np.concatenate([mu, a.flatten(), b.flatten()])
-
-    @staticmethod
-    def unpack(params, dim):
-        mu = params[:dim]
-        a = params[dim:dim * (dim + 1)].reshape(dim, dim)
-        b = params[dim * (dim + 1):].reshape(dim, dim)
-        return mu, a, b
-
-    def to_dict(mu, a, b):
-        return {'mu': mu, 'a': a, 'b': b}
-
 class BoundsConverter:
     @staticmethod
     def to_tensor(bounds_mu, bounds_a, bounds_b):

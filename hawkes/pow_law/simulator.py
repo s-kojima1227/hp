@@ -1,14 +1,19 @@
 from ..base import Simulator as Base
 from .function import Kernels
-from .converter import ParamsConverter as PC
+from .vo import Parameters as Params, ParametersFactory as PF
 
 class Simulator(Base):
-    def __call__(self, mu, K, p, c, T):
-        mu, K, p, c = PC.to_tensor(mu, K, p, c)
-        return super().__call__(
-            mu=mu,
-            kernel=Kernels(K, p, c),
-            T=T,
-            params={'mu': mu, 'K': K, 'p': p, 'c': c},
-            kernel_type='pow_law'
-        )
+    def set_params(self, baselines, multipliers, exponents, cutoffs):
+        self.__params = PF().build_from_packed(baselines, (multipliers, exponents, cutoffs))
+
+    @property
+    def _params(self) -> Params:
+        return self.__params
+
+    @property
+    def _kernels(self) -> Kernels:
+        return Kernels(*self.__params.kernel_params)
+
+    @property
+    def _kernel_type(self) -> str:
+        return 'pow_law'

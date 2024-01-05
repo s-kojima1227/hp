@@ -1,18 +1,36 @@
 import numpy as np
 from .function import LogLik, Intensities
-from ..base import Events, Estimator as Base
-from .converter import ParamsConverter as PC, BoundsConverter as BC
+from ..base import Estimator as Base, Loss
+from .converter import BoundsConverter as BC
+from .vo import Parameters as Params, ParametersFactory as PF
 
 class Estimator(Base):
-    def _build_loss(self, events: Events):
-        return LogLik(events).to_loss()
+    @property
+    def _loss_fn(self) -> Loss:
+        return LogLik(self._events).to_loss()
 
-    def _get_default_minimization_config(self, dim):
+    @property
+    def _intensities_fn(self) -> Intensities:
+        return Intensities(self._params_vo, self._events)
+
+    @property
+    def _params_vo(self) -> Params:
+        return PF(self._dim).build_from_unpacked(self._params)
+
+    @property
+    def _kernel_type(self):
+        return 'pow_law'
+
+    @property
+    def _default_minimization_config(self):
+        dim = self._dim
+        init_params = PF(dim).build_from_unpacked(
+            np.hstack([np.full(dim + dim * dim, 0.1), np.full(dim * dim + dim * dim, 2)])
+        )
         return {
             'method': 'scipy',
-            # FIXME: 初期値が不適当
             'option': {
-                'init_params': np.hstack([np.full(dim + dim * dim, 0.1), np.full(dim * dim + dim * dim, 2)]),
+                'init_params': init_params,
                 'bounds': [(1e-5, None)] * (dim + dim * dim + dim * dim + dim * dim),
             }
         }
@@ -20,12 +38,7 @@ class Estimator(Base):
     def set_minimization_config(self, method, option):
         if method == 'gradient' or method == 'scipy':
             init_params = option.get('init_params')
-            mu = init_params.get('mu')
-            K = init_params.get('K')
-            p = init_params.get('p')
-            c = init_params.get('c')
-            option['init_params'] = \
-                PC.pack(*PC.to_tensor(mu, K, p, c))
+            option['init_params'] = PF().build_from_dict(init_params)
         if method == 'scipy' or method == 'random_search':
             bounds = option.get('bounds')
             bounds_mu = bounds.get('mu')
@@ -44,12 +57,3 @@ class Estimator(Base):
                 BC.pack(*BC.to_tensor(grid_mu, grid_K, grid_p, grid_c))
 
         super().set_minimization_config(method, option)
-
-    def _build_intensities(self, params, events: Events):
-        return Intensities(params, events)
-
-    def _format_params(self, params, dim):
-        return PC.to_dict(*PC.unpack(params, dim))
-
-    def _get_kernel_type(self):
-        return 'pow_law'

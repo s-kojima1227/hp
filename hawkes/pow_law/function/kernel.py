@@ -1,24 +1,19 @@
 import numpy as np
+from ...base import Kernels as Base
 
-class Kernels:
-    def __init__(self, K: np.ndarray, p: np.ndarray, c: np.ndarray):
-        if not (K.shape == p.shape == c.shape):
+class Kernels(Base):
+    def __init__(self, multipliers: np.ndarray, exponents: np.ndarray, cutoffs: np.ndarray):
+        if not (multipliers.shape == exponents.shape == cutoffs.shape):
             raise ValueError('パラメーターの次元が不適切です')
-        dim = K.shape[0]
-        self._kernels = np.array([[self._Kernel(K[i, j], p[i, j], c[i, j]) for j in range(dim)] for i in range(dim)], dtype=object)
-
-    def __getitem__(self, i):
-        return self._kernels[i]
-
-    @property
-    def value(self):
-        return self._kernels
+        dim = multipliers.shape[0]
+        kernels = np.array([[self._Kernel(multipliers[i, j], exponents[i, j], cutoffs[i, j]) for j in range(dim)] for i in range(dim)], dtype=object)
+        super().__init__(kernels)
 
     class _Kernel:
-        def __init__(self, K: float, p: float, c: float):
-            self._K = float(K)
-            self._p = float(p)
-            self._c = float(c)
+        def __init__(self, multiplier: float, exponent: float, cutoff: float):
+            self._multiplier = float(multiplier)
+            self._exponent = float(exponent)
+            self._cutoff = float(cutoff)
 
         def __call__(self, t):
-            return self._K * np.power(t + self._c, -self._p)
+            return self._multiplier * np.power(t + self._cutoff, -self._exponent)

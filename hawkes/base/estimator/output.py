@@ -2,15 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import japanize_matplotlib
-from ..vo.events import Events
+from ..vo import Events, Parameters as Params
+from typing import Dict, Tuple
 
+# TODO: シミュレーターの出力クラスと共通化
 class Output:
-    def __init__(self, events: Events, t, intensity, params, kernel_type, loglik):
+    def __init__(self, events: Events, intensity: Tuple[np.ndarray, np.ndarray], params: Params, kernel_type: str, loglik: float):
         self._events = events.grouped_by_mark
-        self._T = events.end_time
+        self._end_time = events.end_time
         self._dim = events.dim
-        self._t = t
-        self._intensity = intensity
+        self._t = intensity[0]
+        self._intensity = intensity[1]
         self._params = params
         self._kernel_type = kernel_type
         self._loglik = loglik
@@ -22,8 +24,8 @@ class Output:
         return self._events
 
     @property
-    def T(self):
-        return self._T
+    def end_time(self):
+        return self._end_time
 
     @property
     def intensity(self):
@@ -33,7 +35,7 @@ class Output:
 
     @property
     def params(self):
-        return self._params
+        return self._params.dict
 
     @property
     def kernel_type(self):
@@ -45,8 +47,8 @@ class Output:
 
     def info(self):
         kernel_type_text = '- kernel_type: {}'.format(self.kernel_type)
-        params_text = '- params: {}'.format(self._params)
-        end_time_text = '- end_time: {}'.format(self._T)
+        params_text = '- params: {}'.format(self._params.dict)
+        end_time_text = '- end_time: {}'.format(self._end_time)
         loglik_text = '- loglik: {}'.format(self._loglik)
         events_text = '- events:\n' + '\n'.join(['  - dim_{}: {}'.format(i + 1, np.round(self._events[i], 2)) for i in range(self._dim)])
         text = '\n'.join([kernel_type_text, params_text, end_time_text, loglik_text, events_text])
@@ -56,7 +58,7 @@ class Output:
         fig, (ax_legend, ax1, ax2, ax3) = plt.subplots(4, 1, sharex=True, figsize=(20, 5))
         plt.subplots_adjust(hspace=0.4)
         padding = 1
-        ax1.set_xlim(0 - padding, self._T + padding)
+        ax1.set_xlim(0 - padding, self._end_time + padding)
         color_palette = plt.cm.tab10
         ax_legend.axis('off')
         handles = []  # 凡例のためのハンドルを格納するリスト
@@ -69,7 +71,7 @@ class Output:
             events_i = self._events[i]
             intensity_i = self._intensity[i]
 
-            event_with_bounds = np.hstack([0, events_i, self._T])
+            event_with_bounds = np.hstack([0, events_i, self._end_time])
             cumulative_counts = np.arange(0, len(events_i) + 1)
             cumulative_counts = np.hstack([cumulative_counts, cumulative_counts[-1]])
 

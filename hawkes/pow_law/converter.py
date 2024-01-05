@@ -1,28 +1,5 @@
 import numpy as np
 
-class ParamsConverter:
-    @staticmethod
-    def to_tensor(mu, K, p, c):
-        if isinstance(mu, (int, float)):
-            return (np.array([mu]), np.array([[K]]), np.array([[p]]), np.array([[c]]))
-        else:
-            return (np.array(mu), np.array(K), np.array(p), np.array(c))
-
-    @staticmethod
-    def pack(mu, K, p, c):
-        return np.concatenate([mu, K.flatten(), p.flatten(), c.flatten()])
-
-    @staticmethod
-    def unpack(params, dim):
-        mu = params[:dim]
-        K = params[dim:dim * (dim + 1)].reshape(dim, dim)
-        p = params[dim * (dim + 1):dim * (2 * dim + 1)].reshape(dim, dim)
-        c = params[dim * (2 * dim + 1):].reshape(dim, dim)
-        return mu, K, p, c
-
-    def to_dict(mu, K, p, c):
-        return {'mu': mu, 'K': K, 'p': p, 'c': c}
-
 class BoundsConverter:
     @staticmethod
     def to_tensor(bounds_mu, bounds_K, bounds_p, bounds_c):

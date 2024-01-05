@@ -3,14 +3,16 @@ from ...base import LogLik as Base
 from .intensity import Intensities
 from .compensator import compensators
 import numpy as np
-from ..converter import ParamsConverter as PC
+from ..vo import ParametersFactory as PF
 
 class LogLik(Base):
     def _intensity_i(self, mark, time, events: Events, params):
+        params = PF(events.dim).build_from_unpacked(params)
         intensities = Intensities(params, events)
         return intensities[mark](time)
 
     def _compensators(self, time, events: Events, params):
+        params = PF(events.dim).build_from_unpacked(params)
         return compensators(time, events, params)
 
     def grad(self, params):
@@ -21,7 +23,8 @@ class LogLik(Base):
             raise NotImplementedError('指数カーネルの場合の対数尤度の勾配計算は現在1次元のみ対応しています')
 
         events = self._events.grouped_by_mark[0]
-        mu, a, b = PC.unpack(params, dim)
+        # FIXME: mu→baselines, a→adjacencies, b→decays
+        mu, a, b = params
         n = len(events)
         G = np.zeros(n)
         dG_db = np.zeros(n)

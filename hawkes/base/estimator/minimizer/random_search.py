@@ -1,11 +1,12 @@
 import numpy as np
+from .minimizer import Minimizer as Base
 
-class RandomSearch:
+class RandomSearch(Base):
     def __init__(self, n_iter, bounds):
         self._n_iter = n_iter
         self._bounds = bounds
 
-    def __call__(self, objective_func, verbose=True):
+    def __call__(self, objective_func):
         best_score = np.inf
         best_params = None
 
@@ -14,12 +15,11 @@ class RandomSearch:
             score = objective_func(params)
 
             if score < best_score:
-                if verbose:
-                    print('best score updated: iter={}, score={:.3f}, params={}'.format(i, score, params))
+                print('best score updated: iter={}, score={:.3f}, params={}'.format(i, score, params))
                 best_score = score
                 best_params = params
 
-            if i % 1000 == 0 and verbose:
+            if i % 1000 == 0:
                 print('iter: {}'.format(i))
 
         return best_params, best_score

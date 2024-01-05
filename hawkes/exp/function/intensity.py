@@ -1,8 +1,11 @@
 from ...base import Intensities as Base, Events
 from .kernel import Kernels
-from ..converter import ParamsConverter as PC
+from ..vo import Parameters as Params
 
 class Intensities(Base):
-    def __init__(self, params, events: Events):
-        mu, a, b = PC.unpack(params, events.dim)
-        super().__init__(mu, Kernels(a, b), events)
+    def __init__(self, params: Params, events: Events):
+        super().__init__(
+            params.baselines,
+            Kernels(*params.kernel_params),
+            events
+        )

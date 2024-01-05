@@ -3,13 +3,16 @@ from .intensity import Intensities
 from .compensator import compensators
 import numpy as np
 from scipy.special import gamma, digamma
+from ..vo import ParametersFactory as PF
 
 class LogLik(Base):
     def _intensity_i(self, mark, time, events: Events, params):
+        params = PF(events.dim).build_from_unpacked(params)
         intensities = Intensities(params, events)
         return intensities[mark](time)
 
     def _compensators(self, time, events: Events, params):
+        params = PF(events.dim).build_from_unpacked(params)
         return compensators(time, events, params)
 
     def grad(self, params):
@@ -21,6 +24,7 @@ class LogLik(Base):
         events = self._events.grouped_by_mark[0]
         T = self._events.end_time
 
+        # FIXME: mu→baselines, K→multipliers, p→exponents, c→cutoffs
         mu, K, p, c = params
         n = len(events)
         G = np.zeros(n)

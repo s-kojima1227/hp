@@ -1,49 +1,27 @@
 import numpy as np
-from ..vo import Events, EventsFactory
+from ..vo import Events, EventsFactory as EF
+from ..function import Kernels
 
 class ThinningMethod:
-    """間引き法によるHawkes過程のシミュレータ"""
-    def __init__(self, mu, kernel):
-        """
-        Parameters
-        ----------
-        mus : np.ndarray, shape=(n,)
-        kernels : np.ndarray, shape=(n, n)
-            カーネル関数の行列
-        """
-        # FIXME: カーネルの取り扱いを変更する
-        kernel = kernel.value
-        if mu.shape[0] != kernel.shape[0] or mu.shape[0] != kernel.shape[1]:
+    def __init__(self, baselines: np.ndarray, kernels: Kernels):
+        if baselines.shape[0] != kernels.value.shape[0] or baselines.shape[0] != kernels.value.shape[1]:
             raise ValueError('基底強度パラメータとカーネル関数の次元が一致しません')
 
-        self._dim = mu.shape[0]
-        self._mu = mu
-        self._kernel = kernel
+        self._dim = baselines.shape[0]
+        self._baselines = baselines
+        self._kernels = kernels.value
 
-    def __call__(self, T) -> Events:
-        """シミュレーションを実行する
-
-        Parameters
-        ----------
-        T : float
-            シミュレーションの終了時刻
-
-        Returns
-        -------
-        events : list of np.ndarray
-            各ノードのイベント時刻のリスト
-        """
-
+    def __call__(self, end_time) -> Events:
         events = [np.empty(0) for _ in range(self._dim)]
-        lambda_ast = np.sum(self._mu)
+        lambda_ast = np.sum(self._baselines)
         t = 0
 
-        while t < T:
+        while t < end_time:
             # 平均 1/lambda_ast の指数分布に従う乱数Eを生成し、次のイベントの候補の発生時刻を t <- t + E とする
             E = np.random.exponential(1 / lambda_ast)
             t += E
 
-            if t > T: break
+            if t > end_time: break
 
             # 採択率rを計算する
             lambda_k_s = np.array([self._lambda_k(k, t, events) for k in range(self._dim)])
@@ -57,19 +35,17 @@ class ThinningMethod:
                 # どのノードでイベントが発生するかを決める
                 k = np.random.choice(self._dim, p=lambda_k_s/lambda_)
                 events[k] = np.append(events[k], t)
-                lambda_ast = lambda_ + np.sum([self._kernel[k, i](0) for i in range(self._dim)])
+                lambda_ast = lambda_ + np.sum([self._kernels[k, i](0) for i in range(self._dim)])
             else:
                 lambda_ast = lambda_
 
-        return EventsFactory.from_events_grouped_by_mark(events, T)
+        return EF.from_events_grouped_by_mark(events, end_time)
 
     def _lambda(self, t, events):
-        """全ノードにおける条件付き強度を計算する"""
         return np.sum([self._lambda_k(k, t, events) for k in range(self._dim)])
 
     def _lambda_k(self, k, t, events):
-        """ノードkにおける条件付き強度を計算する"""
-        return self._mu[k] + np.sum([np.sum(self._kernel[k, i](t - events[i][events[i] < t])) for i in range(self._dim)])
+        return self._baselines[k] + np.sum([np.sum(self._kernels[k, i](t - events[i][events[i] < t])) for i in range(self._dim)])
 
 
 
