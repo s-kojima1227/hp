@@ -1,13 +1,19 @@
 from ..base import Simulator as Base
 from .function import Kernels
-from .converter import ParamsConverter as PC
+from .vo import Parameters as Params, ParametersFactory as PF
 
 class Simulator(Base):
-    def __call__(self, baselines, adjacencies, decays, end_time):
-        return super().__call__(
-            baselines,
-            Kernels(adjacencies, decays),
-            end_time,
-            params=PC.to_dict(baselines, adjacencies, decays),
-            kernel_type='sum_exp'
-        )
+    def set_params(self, baselines, adjacencies, decays):
+        self.__params = PF().build_from_packed(baselines, (adjacencies, decays))
+
+    @property
+    def _params(self) -> Params:
+        return self.__params
+
+    @property
+    def _kernels(self) -> Kernels:
+        return Kernels(*self.__params.kernel_params)
+
+    @property
+    def _kernel_type(self) -> str:
+        return 'sum_exp'

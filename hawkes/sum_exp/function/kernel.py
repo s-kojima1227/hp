@@ -1,17 +1,12 @@
 import numpy as np
 from typing import Union
+from ...base import Kernels as Base
 
-class Kernels:
+class Kernels(Base):
     def __init__(self, adjacencies: np.ndarray, decays: np.ndarray):
         dim = adjacencies.shape[0]
-        self._kernels = np.array([[self._Kernel(adjacencies[i, j], decays) for j in range(dim)] for i in range(dim)], dtype=object)
-
-    def __getitem__(self, i):
-        return self._kernels[i]
-
-    @property
-    def value(self):
-        return self._kernels
+        kernels = np.array([[self._Kernel(adjacencies[i, j], decays) for j in range(dim)] for i in range(dim)], dtype=object)
+        super().__init__(kernels)
 
     class _Kernel:
         def __init__(self, adjacencies_ij: np.ndarray, decays: np.ndarray):

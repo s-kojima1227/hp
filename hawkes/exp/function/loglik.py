@@ -1,5 +1,4 @@
-from hawkes.base.vo.events import Events
-from ...base import LogLik as Base
+from ...base import LogLik as Base, Events
 from .intensity import Intensities
 from .compensator import compensators
 import numpy as np
