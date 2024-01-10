@@ -41,18 +41,18 @@ class Estimator(Base):
             option['init_params'] = PF().build_from_dict(init_params)
         if method == 'scipy' or method == 'random_search':
             bounds = option.get('bounds')
-            bounds_mu = bounds.get('mu')
-            bounds_K = bounds.get('K')
-            bounds_p = bounds.get('p')
-            bounds_c = bounds.get('c')
+            bounds_mu = bounds.get('baselines')
+            bounds_K = bounds.get('multipliers')
+            bounds_p = bounds.get('exponents')
+            bounds_c = bounds.get('cutoffs')
             option['bounds'] = \
                 BC.pack(*BC.to_tensor(bounds_mu, bounds_K, bounds_p, bounds_c))
         if method == 'grid_search':
             grid = option.get('grid')
-            grid_mu = grid.get('mu')
-            grid_K = grid.get('K')
-            grid_p = grid.get('p')
-            grid_c = grid.get('c')
+            grid_mu = grid.get('baselines')
+            grid_K = grid.get('multipliers')
+            grid_p = grid.get('exponents')
+            grid_c = grid.get('cutoffs')
             option['grid'] = \
                 BC.pack(*BC.to_tensor(grid_mu, grid_K, grid_p, grid_c))
 

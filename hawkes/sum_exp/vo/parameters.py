@@ -38,7 +38,7 @@ class Parameters(BaseP):
     def decays(self) -> np.ndarray:
         dim = self._dim
         num_exps = self._num_exp
-        return self._unpacked[dim+dim*dim*num_exps:].reshape(num_exps)
+        return self._unpacked[dim+dim*dim*num_exps:]
 
     @property
     def kernel_params(self) -> Tuple[np.ndarray, np.ndarray]:
@@ -51,9 +51,8 @@ class ParametersFactory(BasePF):
 
     def build_from_packed(self, baselines, kernel_params) -> Parameters:
         adjacencies, decays = kernel_params
-        # FIXME: U=1の場合とD=1の場合の対応をする.
         if isinstance(baselines, (int, float)):
-            baselines, adjacencies, decays = (np.array([baselines]), np.array([[adjacencies]]), np.array([[decays]]))
+            baselines, adjacencies, decays = (np.array([baselines]), np.array([[adjacencies]]), np.array(decays))
         else:
             baselines, adjacencies, decays = (np.array(baselines), np.array(adjacencies), np.array(decays))
 

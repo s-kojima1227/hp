@@ -38,16 +38,16 @@ class Estimator(Base):
             option['init_params'] = PF().build_from_dict(init_params)
         if method == 'scipy' or method == 'random_search':
             bounds = option.get('bounds')
-            bounds_mu = bounds.get('mu')
-            bounds_a = bounds.get('a')
-            bounds_b = bounds.get('b')
+            bounds_mu = bounds.get('baselines')
+            bounds_a = bounds.get('adjacencies')
+            bounds_b = bounds.get('decays')
             option['bounds'] = \
                 BC.pack(*BC.to_tensor(bounds_mu, bounds_a, bounds_b))
         if method == 'grid_search':
             grid = option.get('grid')
-            grid_mu = grid.get('mu')
-            grid_a = grid.get('a')
-            grid_b = grid.get('b')
+            grid_mu = grid.get('baselines')
+            grid_a = grid.get('adjacencies')
+            grid_b = grid.get('decays')
             option['grid'] = \
                 BC.pack(*BC.to_tensor(grid_mu, grid_a, grid_b))
 

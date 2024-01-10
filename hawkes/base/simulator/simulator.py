@@ -37,6 +37,10 @@ class Simulator(ABC):
             kernel_type=self._kernel_type
         )
 
+    @abstractmethod
+    def set_params(self, params: Params) -> None:
+        pass
+
     @property
     @abstractmethod
     def _params(self) -> Params:
