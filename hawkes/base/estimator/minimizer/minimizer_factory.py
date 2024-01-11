@@ -1,5 +1,5 @@
 from .gradient_method import GradientMethod
-from .scipy_minimizer import ScipyMinimizer
+from .l_bfgs_b import L_MFGS_B
 from .random_search import RandomSearch
 from .grid_search import GridSearch
 
@@ -14,8 +14,8 @@ class MinimizerFactory:
                 max_iter=option.get('max_iter', 1000000),
                 init_params=option.get('init_params'),
             )
-        elif method == 'scipy':
-            return ScipyMinimizer(
+        elif method == 'l_bfgs_b':
+            return L_MFGS_B(
                 init_params=option.get('init_params'),
                 bounds=option.get('bounds'),
             )

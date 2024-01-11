@@ -25,7 +25,7 @@ class Estimator(Base):
     def _default_minimization_config(self):
         dim = self._dim
         return {
-            'method': 'scipy',
+            'method': 'l_bfgs_b',
             'option': {
                 'init_params': PF(dim).build_from_unpacked(np.full(dim + dim * dim + dim * dim, 0.1)),
                 'bounds': [(1e-5, None)] * (dim + dim * dim + dim * dim),
@@ -33,10 +33,10 @@ class Estimator(Base):
         }
 
     def set_minimization_config(self, method, option):
-        if method == 'gradient' or method == 'scipy':
+        if method == 'gradient' or method == 'l_bfgs_b':
             init_params = option.get('init_params')
             option['init_params'] = PF().build_from_dict(init_params)
-        if method == 'scipy' or method == 'random_search':
+        if method == 'l_bfgs_b' or method == 'random_search':
             bounds = option.get('bounds')
             bounds_mu = bounds.get('baselines')
             bounds_a = bounds.get('adjacencies')

@@ -28,7 +28,7 @@ class Estimator(Base):
             np.hstack([np.full(dim + dim * dim, 0.1), np.full(dim * dim + dim * dim, 2)])
         )
         return {
-            'method': 'scipy',
+            'method': 'l_bfgs_b',
             'option': {
                 'init_params': init_params,
                 'bounds': [(1e-5, None)] * (dim + dim * dim + dim * dim + dim * dim),
@@ -36,10 +36,10 @@ class Estimator(Base):
         }
 
     def set_minimization_config(self, method, option):
-        if method == 'gradient' or method == 'scipy':
+        if method == 'gradient' or method == 'l_bfgs_b':
             init_params = option.get('init_params')
             option['init_params'] = PF().build_from_dict(init_params)
-        if method == 'scipy' or method == 'random_search':
+        if method == 'l_bfgs_b' or method == 'random_search':
             bounds = option.get('bounds')
             bounds_mu = bounds.get('baselines')
             bounds_K = bounds.get('multipliers')

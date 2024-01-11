@@ -36,7 +36,7 @@ class Estimator(Base):
         sum_dim = dim_baselines + dim_adjacencies + dim_decays
 
         return {
-            'method': 'scipy',
+            'method': 'l_bfgs_b',
             'option': {
                 'init_params': PF(dim, num_exps).build_from_unpacked(np.full(sum_dim, 0.1)),
                 'bounds': [(1e-5, None)] * sum_dim,
@@ -44,10 +44,10 @@ class Estimator(Base):
         }
 
     def set_minimization_config(self, method, option):
-        if method == 'scipy':
+        if method == 'l_bfgs_b':
             init_params = option.get('init_params')
             option['init_params'] = PF().build_from_dict(init_params)
         else:
-            raise NotImplementedError('現在scipyのみ対応しています')
+            raise NotImplementedError('現在l_bfgs_bのみ対応しています')
 
         super().set_minimization_config(method, option)
